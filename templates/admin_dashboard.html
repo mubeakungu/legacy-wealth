@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Wealth — Admin</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --gold: #d4af37;
+      --gold-light: #f5d76e;
+      --gold-dark: #8a6d1d;
+      --bg: #0d1224;
+      --panel: #161c36;
+      --panel-2: #1c2345;
+      --border: rgba(212, 175, 55, 0.18);
+      --border-strong: rgba(212, 175, 55, 0.35);
+      --text: #e5e7eb;
+      --muted: #8b93a7;
+      --green: #4ade80;
+      --red: #f87171;
+      --amber: #fdba74;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, -apple-system, Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ───────── SIDEBAR ───────── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #1b2140 0%, #131934 100%);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-header {
+      padding: 22px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-mark {
+      width: 44px; height: 44px; flex-shrink: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+      color: #0d1224;
+      font-weight: 800;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      letter-spacing: 0.5px;
+    }
+    .logo-img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .brand-text { min-width: 0; }
+    .sidebar-brand {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .admin-badge {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .sidebar-nav { flex: 1; padding: 18px 0; }
+    .nav-item {
+      padding: 13px 16px;
+      margin: 4px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-left: 3px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-item:hover { background: rgba(212, 175, 55, 0.06); color: var(--gold-light); }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.04));
+      color: var(--gold);
+      font-weight: 600;
+      border-left-color: var(--gold);
+    }
+    .nav-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+    .nav-count {
+      margin-left: auto;
+      background: var(--gold);
+      color: #0d1224;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+    .logout-btn {
+      flex: 1;
+      padding: 11px;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(212, 175, 55, 0.18); }
+
+    /* ───────── MAIN ───────── */
+    .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    .navbar {
+      background: var(--panel);
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .navbar-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+    .nav-brand { font-size: 14px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+    .sched-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; padding: 6px 12px; border-radius: 20px;
+      border: 1px solid var(--border); color: var(--muted);
+      background: rgba(212, 175, 55, 0.05);
+      white-space: nowrap;
+    }
+    .sched-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(74, 222, 128, 0.3); }
+    .sched-dot.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 1000;
+    }
+    .sidebar-overlay.show { display: block; }
+
+    .content { flex: 1; overflow-y: auto; padding: 28px 32px; }
+
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .page-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; color: var(--gold); }
+    .page-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+    /* ───────── CARDS & STATS ───────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+    .stat-card:hover { border-color: var(--border-strong); box-shadow: 0 4px 16px rgba(212, 175, 55, 0.08); }
+    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
+    .stat-value { font-size: 26px; font-weight: 700; color: var(--gold); }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card-title { font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+    .card-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .chart-container { position: relative; height: 220px; }
+
+    .form-wrap { max-width: 520px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 11px; color: var(--gold); margin-bottom: 6px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 13px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #5b6378; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+    }
+    .form-group textarea { resize: vertical; height: 80px; }
+    .form-group option { background: var(--panel); color: var(--text); }
+
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: #0d1224;
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.25);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4); }
+    .btn-sm { padding: 9px 14px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; transition: all 0.2s; }
+    .btn-green { background: #22a56b; color: #ffffff; }
+    .btn-green:hover { background: #1c8d5a; }
+    .btn-danger { background: #dc4c4c; color: #ffffff; }
+    .btn-danger:hover { background: #b93c3c; }
+    .btn-ghost { background: rgba(139, 147, 167, 0.15); color: #d1d5db; }
+    .btn-gold-soft { background: rgba(212, 175, 55, 0.15); color: var(--gold); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .alert {
+      padding: 14px 16px; border-radius: 8px; margin-bottom: 16px;
+      font-size: 13px; display: none; animation: slideIn 0.25s ease;
+      border-left: 4px solid; font-weight: 600;
+    }
+    .alert.show { display: block; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .alert-success { background: rgba(74, 222, 128, 0.12); border-color: var(--green); color: #86efac; }
+    .alert-error { background: rgba(248, 113, 113, 0.12); border-color: var(--red); color: #fca5a5; }
+
+    .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tbl th {
+      padding: 13px 12px; text-align: left; color: var(--gold);
+      background: rgba(212, 175, 55, 0.1);
+      border-bottom: 1px solid var(--border-strong);
+      font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .tbl td { padding: 13px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text); }
+    .tbl tr:hover { background: rgba(212, 175, 55, 0.04); }
+
+    .badge { display: inline-block; padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .badge-success { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+    .badge-pending { background: rgba(253, 186, 116, 0.15); color: var(--amber); }
+    .badge-danger { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+    .badge-info { background: rgba(212, 175, 55, 0.15); color: var(--gold); }
+
+    .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+    .loading { text-align: center; padding: 30px; color: var(--muted); }
+
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+    .filter-bar input, .filter-bar select {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      padding: 10px 12px; border-radius: 8px; font-size: 12px; transition: all 0.2s;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18); }
+    .filter-bar option { background: var(--panel); }
+
+    /* ───────── MODALS ───────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 2000;
+      justify-content: center; align-items: center;
+      padding: 16px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 26px;
+      width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    .modal h3 { color: var(--gold); margin-bottom: 18px; font-size: 18px; font-weight: 700; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }
+    .modal-info {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; margin-bottom: 14px;
+      font-size: 13px; line-height: 2;
+    }
+
+    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tbl-wrapper { overflow-x: auto; }
+
+    .tab-group { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .tab-btn {
+      padding: 12px 16px; background: none; border: none; color: var(--muted);
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      border-bottom: 2px solid transparent; white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--gold-light); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .option-box {
+      padding: 16px; background: rgba(212, 175, 55, 0.05);
+      border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px;
+    }
+    .checkbox-group {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+    }
+    .checkbox-group input[type="radio"], .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--gold); }
+
+    /* ───────── RESPONSIVE ───────── */
+    @media (max-width: 1024px) {
+      .sidebar { width: 210px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .content { padding: 24px; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0; bottom: 0; left: -260px;
+        width: 260px;
+        z-index: 1001;
+        transition: left 0.3s ease;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+      }
+      .sidebar.active { left: 0; }
+      .sidebar-overlay.show { display: block; }
+      .mobile-menu-btn { display: block; }
+      .navbar { padding: 12px 16px; }
+      .content { padding: 18px; }
+      .page-title { font-size: 22px; }
+      .page-subtitle { font-size: 12px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .stat-card { padding: 16px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 10px; }
+      .card { padding: 16px; margin-bottom: 16px; }
+      .card-title { font-size: 14px; }
+      .tbl { font-size: 11px; }
+      .tbl th, .tbl td { padding: 8px; }
+      .btn-sm { padding: 7px 10px; font-size: 11px; }
+      .form-group input, .form-group select, .form-group textarea { padding: 10px; font-size: 12px; }
+      .filter-bar { gap: 8px; }
+      .action-btns { gap: 6px; }
+      .sched-pill { font-size: 10px; padding: 4px 10px; }
+    }
+
+    @media (max-width: 480px) {
+      .content { padding: 14px; }
+      .page-title { font-size: 20px; margin-bottom: 6px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+      .stat-value { font-size: 18px; }
+      .navbar { flex-wrap: wrap; }
+      .nav-brand { font-size: 13px; }
+      .tbl { font-size: 10px; }
+      .tbl th, .tbl td { padding: 6px; }
+      .modal { width: 95vw; padding: 16px; }
+      .filter-bar { flex-direction: column; }
+      .filter-bar input, .filter-bar select { width: 100%; }
+      .action-btns { flex-direction: column; }
+      .action-btns button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-mark">LW</div>
+    <div class="brand-text">
+      <div class="sidebar-brand">Legacy Wealth</div>
+      <div class="admin-badge">🔐 Admin</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="openPage('dashboard', this)">
+      <span class="nav-icon">📊</span><span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="openPage('deposits', this)">
+      <span class="nav-icon">📥</span><span>Pending Deposits</span>
+      <span class="nav-count" id="navDepositCount" style="display:none;">0</span>
+    </div>
+    <div class="nav-item" onclick="openPage('withdrawals', this)">
+      <span class="nav-icon">📤</span><span>Pending Withdrawals</span>
+      <span class="nav-count" id="navWithdrawCount" style="display:none;">0</span>
+    </div>
+    <div class="nav-item" onclick="openPage('clients', this)">
+      <span class="nav-icon">👥</span><span>Clients</span>
+    </div>
+    <div class="nav-item" onclick="openPage('transactions', this)">
+      <span class="nav-icon">💱</span><span>Transactions</span>
+    </div>
+    <div class="nav-item" onclick="openPage('referrals', this)">
+      <span class="nav-icon">🎁</span><span>Referrals</span>
+    </div>
+    <div class="nav-item" onclick="openPage('trades', this)">
+      <span class="nav-icon">📈</span><span>Trades</span>
+    </div>
+    <div class="nav-item" onclick="openPage('adjust', this)">
+      <span class="nav-icon">⚙️</span><span>Manage Accounts</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-container">
+  <header class="navbar">
+    <div class="navbar-left">
+      <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
+      <div class="nav-brand" id="pageHeader">Dashboard</div>
+    </div>
+    <span class="sched-pill">
+      <span class="sched-dot" id="schedDot"></span>
+      <span id="schedText">Scheduler: —</span>
+    </span>
+  </header>
+
+  <main class="content">
+    <div class="alert alert-success" id="globalSuccess"></div>
+    <div class="alert alert-error" id="globalError"></div>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="page active">
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle">Platform overview and analytics</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Clients</div>
+          <div class="stat-value" id="statClients">—</div>
+          <div class="stat-sub">Registered users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Deposits</div>
+          <div class="stat-value">$<span id="statDeposits">0.00</span></div>
+          <div class="stat-sub">Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Withdrawals</div>
+          <div class="stat-value">$<span id="statWithdrawals">0.00</span></div>
+          <div class="stat-sub">Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Deposits</div>
+          <div class="stat-value" style="color:var(--amber);" id="statPending">—</div>
+          <div class="stat-sub">Awaiting approval</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Profit Paid</div>
+          <div class="stat-value" style="color:var(--green);">$<span id="statProfitPaid">0.00</span></div>
+          <div class="stat-sub"><span id="statTradesToday">0</span> trades today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Referral Commissions</div>
+          <div class="stat-value">$<span id="statRefs">0.00</span></div>
+          <div class="stat-sub"><span id="statRefCount">0</span> referrals</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📊 Deposits vs Withdrawals</div>
+          <div class="card-subtitle">Monthly transaction summary</div>
+          <div class="chart-container"><canvas id="txChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📈 Client Growth</div>
+          <div class="card-subtitle">Cumulative registrations</div>
+          <div class="chart-container"><canvas id="clientChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PENDING DEPOSITS -->
+    <section id="deposits" class="page">
+      <div class="page-title">Pending Deposits</div>
+      <div class="page-subtitle">Approve or reject incoming deposits</div>
+      <div class="card">
+        <div class="tbl-wrapper"><div id="pendingList" class="loading">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- PENDING WITHDRAWALS -->
+    <section id="withdrawals" class="page">
+      <div class="page-title">Pending Withdrawals</div>
+      <div class="page-subtitle">Process outgoing withdrawals</div>
+      <div class="card">
+        <div class="tbl-wrapper"><div id="pendingWdrList" class="loading">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section id="clients" class="page">
+      <div class="page-title">Clients</div>
+      <div class="page-subtitle">Manage user accounts and balances</div>
+      <div class="card">
+        <div class="filter-bar">
+          <input type="text" id="clientSearch" placeholder="Search by name or email..." oninput="filterClients()" style="flex:1;min-width:200px;">
+        </div>
+        <div class="tbl-wrapper"><div id="clientList" class="loading">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section id="transactions" class="page">
+      <div class="page-title">Transactions</div>
+      <div class="page-subtitle">Complete transaction history</div>
+      <div class="card">
+        <div class="filter-bar">
+          <input type="text" id="txSearch" placeholder="Search name, reference..." oninput="filterTx()" style="flex:1;min-width:200px;">
+          <select id="txTypeFilter" onchange="filterTx()">
+            <option value="">All Types</option>
+            <option value="DEPOSIT">Deposits</option>
+            <option value="WITHDRAWAL">Withdrawals</option>
+            <option value="REFERRAL_WITHDRAWAL">Referral Withdrawals</option>
+            <option value="ADJUSTMENT">Adjustments</option>
+          </select>
+          <select id="txStatusFilter" onchange="filterTx()">
+            <option value="">All Statuses</option>
+            <option value="PENDING">Pending</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        </div>
+        <div class="tbl-wrapper"><div id="txList" class="loading">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- REFERRALS -->
+    <section id="referrals" class="page">
+      <div class="page-title">Referral Commissions</div>
+      <div class="page-subtitle">All referral transactions</div>
+      <div class="card">
+        <div class="tbl-wrapper"><div id="referralList" class="loading">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- TRADES -->
+    <section id="trades" class="page">
+      <div class="page-title">Trades</div>
+      <div class="page-subtitle">All client trades</div>
+      <div class="card">
+        <div class="filter-bar">
+          <select id="tradeStatusFilter" onchange="loadTrades()">
+            <option value="">All Trades</option>
+            <option value="OPEN">Open</option>
+            <option value="CLOSED">Closed</option>
+          </select>
+          <button class="btn btn-primary" style="margin-left:auto;" onclick="runTradesNow(this)">▶ Run Trades Now</button>
+        </div>
+        <div class="tbl-wrapper"><div id="tradeList" class="loading">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- MANAGE ACCOUNTS -->
+    <section id="adjust" class="page">
+      <div class="page-title">Manage Accounts</div>
+      <div class="page-subtitle">Adjust balances, create transactions, and manage referrals</div>
+
+      <div class="tab-group">
+        <button class="tab-btn active" onclick="switchAdjustTab('balance', this)">💰 Balance & Transactions</button>
+        <button class="tab-btn" onclick="switchAdjustTab('referral', this)">🎁 Create Referral</button>
+      </div>
+
+      <!-- TAB 1 -->
+      <div id="balanceTab" class="tab-content active">
+        <div class="card form-wrap">
+          <div class="form-group">
+            <label>Select Client</label>
+            <select id="adjustClient" onchange="updateAdjustCurrentValue()">
+              <option value="">— Select client —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Field to Adjust</label>
+            <select id="adjustField" onchange="updateAdjustCurrentValue()">
+              <option value="balance">Balance (direct ledger nudge)</option>
+              <option value="equity">Equity (direct ledger nudge)</option>
+              <option value="total_deposits">Total Deposits (creates a real deposit)</option>
+              <option value="total_withdrawals">Total Withdrawals (creates a real withdrawal)</option>
+              <option value="total_profit">Trade Profit</option>
+              <option value="total_ref_earned">Referral Earnings</option>
+            </select>
+          </div>
+          <div id="adjustCurrentVal" style="font-size:11px;color:var(--muted);margin:-8px 0 14px;">Current value: —</div>
+
+          <div class="form-group" id="adjustMethodGroup" style="display:none;">
+            <label>Method / Network</label>
+            <select id="adjustMethod">
+              <option value="MANUAL">Manual / Cash</option>
+              <option value="TRC20">USDT — TRC20</option>
+              <option value="BEP20">USDT — BEP20</option>
+              <option value="ERC20">USDT — ERC20</option>
+              <option value="MPESA">M-Pesa</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label id="adjustAmountLabel">Amount (positive = add, negative = subtract)</label>
+            <input type="number" id="adjustAmount" placeholder="e.g. 500 or -200">
+          </div>
+          <div class="form-group">
+            <label>Reason / Note</label>
+            <textarea id="adjustNote" placeholder="e.g. Profit credit, Bonus, Correction..."></textarea>
+          </div>
+          <div class="alert alert-success" id="adjustSuccess"></div>
+          <div class="alert alert-error" id="adjustError"></div>
+          <button class="btn btn-primary" style="width:100%;" onclick="submitAdjust()">Apply Adjustment</button>
+        </div>
+      </div>
+
+      <!-- TAB 2 -->
+      <div id="referralTab" class="tab-content">
+        <div class="card form-wrap">
+          <div class="form-group">
+            <label>🎯 Referrer (the person earning)</label>
+            <select id="refReferrer" onchange="onReferrerChange()">
+              <option value="">— Select a referrer —</option>
+            </select>
+          </div>
+
+          <div class="option-box">
+            <div style="font-size:12px;font-weight:600;margin-bottom:12px;color:var(--gold);">Who is being referred?</div>
+            <label class="checkbox-group">
+              <input type="radio" name="refMode" value="existing" onchange="onRefModeChange()" checked>
+              <span style="flex:1;">Link Existing Client</span>
+            </label>
+            <label class="checkbox-group" style="margin-top:8px;">
+              <input type="radio" name="refMode" value="new" onchange="onRefModeChange()">
+              <span style="flex:1;">Create New Member</span>
+            </label>
+          </div>
+
+          <div id="existingClientMode">
+            <div class="form-group">
+              <label>👤 Select Referred Client</label>
+              <select id="refReferred">
+                <option value="">— Select client to refer —</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="newMemberMode" style="display:none;">
+            <div class="form-group">
+              <label>👤 New Member Name</label>
+              <input type="text" id="refNewName" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label>📧 Email Address</label>
+              <input type="email" id="refNewEmail" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+              <label>📱 Phone Number</label>
+              <input type="text" id="refNewPhone" placeholder="+254 7xx xxx xxx">
+            </div>
+            <div class="form-group">
+              <label>🔐 Password</label>
+              <input type="password" id="refNewPassword" placeholder="Min 6 characters">
+            </div>
+          </div>
+
+          <div class="option-box">
+            <label class="checkbox-group">
+              <input type="checkbox" id="refCreateDeposit" onchange="onRefDepositToggle()">
+              <span style="flex:1;">💵 Add Initial Deposit</span>
+            </label>
+          </div>
+
+          <div id="refDepositSection" style="display:none;">
+            <div class="form-group">
+              <label>Deposit Amount (USD)</label>
+              <input type="number" id="refDepositAmount" placeholder="e.g. 500" min="0">
+            </div>
+            <div class="form-group">
+              <label>Deposit Method</label>
+              <select id="refDepositMethod">
+                <option value="MANUAL">Manual / Cash</option>
+                <option value="TRC20">USDT — TRC20</option>
+                <option value="BEP20">USDT — BEP20</option>
+                <option value="ERC20">USDT — ERC20</option>
+                <option value="MPESA">M-Pesa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>📝 Note</label>
+            <textarea id="refNote" placeholder="e.g. Test referral, Team member..."></textarea>
+          </div>
+
+          <div class="alert alert-success" id="refSuccess"></div>
+          <div class="alert alert-error" id="refError"></div>
+          <button class="btn btn-primary" style="width:100%;" onclick="submitReferral()">✓ Create Referral</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="approveModal">
+  <div class="modal">
+    <h3>✓ Approve Deposit</h3>
+    <div class="modal-info">
+      <div><span style="color:var(--muted);">Client:</span> <strong id="modalClientName"></strong></div>
+      <div><span style="color:var(--muted);">Amount:</span> <span id="modalAmount" style="color:var(--green);font-weight:bold;"></span></div>
+      <div><span style="color:var(--muted);">Method:</span> <span id="modalNetwork"></span></div>
+      <div><span style="color:var(--muted);">Reference:</span> <span id="modalRef" style="font-size:11px;"></span></div>
+    </div>
+    <input type="hidden" id="modalTxId">
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('approveModal')">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="confirmApprove()">Approve</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <h3>✗ Reject Deposit</h3>
+    <div class="form-group">
+      <label>Reason</label>
+      <textarea id="rejectReason" placeholder="e.g. Transaction not found..."></textarea>
+    </div>
+    <input type="hidden" id="rejectTxId">
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('rejectModal')">Cancel</button>
+      <button class="btn btn-sm btn-danger" onclick="confirmReject()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="approveWdrModal">
+  <div class="modal">
+    <h3>✓ Approve Withdrawal</h3>
+    <div class="modal-info" style="line-height:2.2;">
+      <div><span style="color:var(--muted);">Client:</span> <strong id="wdrModalClientName"></strong></div>
+      <div><span style="color:var(--muted);">Amount:</span> <span id="wdrModalAmount" style="font-size:17px;font-weight:bold;"></span></div>
+      <div><span style="color:var(--muted);">Network:</span> <span id="wdrModalNetwork" style="color:var(--gold);font-weight:bold;"></span></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <span style="color:var(--muted);">Send To:</span>
+        <span style="flex:1;">
+          <span id="wdrModalAddress" style="font-family:monospace;font-size:11px;color:var(--gold-light);word-break:break-all;"></span>
+          <button class="btn-sm btn-gold-soft" style="margin-left:8px;vertical-align:top;display:inline-block;" onclick="copyAddress(this)">📋 Copy</button>
+        </span>
+      </div>
+    </div>
+    <input type="hidden" id="wdrModalTxId">
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('approveWdrModal')">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="confirmWdrApprove()">I've Sent - Approve</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="rejectWdrModal">
+  <div class="modal">
+    <h3>✗ Reject Withdrawal</h3>
+    <div class="form-group">
+      <label>Reason</label>
+      <textarea id="rejectWdrReason" placeholder="e.g. Invalid address..."></textarea>
+    </div>
+    <input type="hidden" id="rejectWdrTxId">
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('rejectWdrModal')">Cancel</button>
+      <button class="btn btn-sm btn-danger" onclick="confirmWdrReject()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editClientModal">
+  <div class="modal">
+    <h3>✏ Edit Client</h3>
+    <input type="hidden" id="editClientId">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="editClientName" placeholder="Full name">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="editClientEmail" placeholder="email@example.com">
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="text" id="editClientPhone" placeholder="+254 7xx xxx xxx">
+    </div>
+    <div class="alert alert-error" id="editClientErr"></div>
+    <div class="alert alert-success" id="editClientOk"></div>
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('editClientModal')">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="saveClientEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deleteClientModal">
+  <div class="modal">
+    <h3>🗑️ Delete Client</h3>
+    <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;">
+      <strong style="color:#fca5a5;">⚠️ WARNING: This action cannot be undone!</strong>
+      <p style="margin-top:10px;color:#d1d5db;">All data for <strong id="deleteClientName"></strong> will be permanently deleted, including:</p>
+      <ul style="margin-top:8px;margin-left:20px;color:var(--muted);">
+        <li>Account balance</li>
+        <li>Transaction history</li>
+        <li>Trade records</li>
+        <li>Referral data</li>
+      </ul>
+    </div>
+    <input type="hidden" id="deleteClientId">
+    <div class="alert alert-error" id="deleteClientErr"></div>
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" onclick="closeModal('deleteClientModal')">Cancel</button>
+      <button class="btn btn-sm btn-danger" onclick="confirmDeleteClient()">Yes, Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const api  = (url, opts = {}) => fetch(url, { credentials: 'same-origin', ...opts }).then(r => r.json());
+const post = (u, b) => api(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+const fmt  = n => parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtD = n => '$' + fmt(n);
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const _txMap = {};
+const _clientMap = {};
+let allTx = [], allClients = [];
+let txChart, clientChart;
+let activeTab = 'dashboard';
+
+function storeTx(tx) { _txMap[tx.id] = tx; }
+function storeClient(c) { _clientMap[c.id] = c; }
+
+function setHTML(el, html) {
+  if (typeof el === 'string') el = document.getElementById(el);
+  if (el && el.innerHTML !== html) el.innerHTML = html;
+}
+
+// SIDEBAR (mobile drawer)
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('active');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function closeSidebarOnMobile() {
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  }
+}
+
+// TABS
+function switchAdjustTab(tabName, el) {
+  document.querySelectorAll('#adjust .tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#adjust .tab-btn').forEach(b => b.classList.remove('active'));
+  if (tabName === 'balance') document.getElementById('balanceTab').classList.add('active');
+  if (tabName === 'referral') document.getElementById('referralTab').classList.add('active');
+  el.classList.add('active');
+}
+
+// PAGE NAVIGATION
+function openPage(pageName, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  document.getElementById(pageName).classList.add('active');
+  el.classList.add('active');
+
+  const titles = { dashboard: 'Dashboard', deposits: 'Pending Deposits', withdrawals: 'Pending Withdrawals', clients: 'Clients', transactions: 'Transactions', referrals: 'Referrals', trades: 'Trades', adjust: 'Manage Accounts' };
+  document.getElementById('pageHeader').textContent = titles[pageName];
+  activeTab = pageName;
+  closeSidebarOnMobile();
+
+  if (pageName === 'deposits') renderPending(allTx);
+  if (pageName === 'withdrawals') renderPendingWithdrawals(allTx);
+  if (pageName === 'clients') renderClients(allClients);
+  if (pageName === 'transactions') renderTx(allTx);
+  if (pageName === 'referrals') loadReferrals();
+  if (pageName === 'trades') loadTrades();
+  if (pageName === 'adjust') { populateAdjustClients(); populateRefReferrers(); populateRefReferred(); }
+}
+
+function showSuccess(msg, id = 'globalSuccess') {
+  const el = document.getElementById(id);
+  el.textContent = '✓ ' + msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function showError(msg, id = 'globalError') {
+  const el = document.getElementById(id);
+  el.textContent = '✗ ' + msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+async function logout() {
+  await post('/api/auth/logout', {});
+  window.location.href = '/admin';
+}
+
+// COPY HELPERS
+function copyAddress(btn) {
+  const addr = document.getElementById('wdrModalAddress').textContent;
+  if (!addr || addr === '—') { showError('No address to copy'); return; }
+  navigator.clipboard.writeText(addr).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(err => showError('Failed to copy: ' + err.message));
+}
+
+function copyWdrAddress(addr, btn) {
+  if (!addr || addr === '—') { showError('No address to copy'); return; }
+  navigator.clipboard.writeText(addr).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  }).catch(err => showError('Failed to copy: ' + err.message));
+}
+
+// STATS & CHARTS
+async function loadStats() {
+  const d = await api('/api/admin/stats');
+  if (!d.success) { window.location.href = '/admin'; return; }
+  const s = d.data;
+
+  document.getElementById('statClients').textContent = s.clients;
+  document.getElementById('statDeposits').textContent = fmt(s.deposits);
+  document.getElementById('statWithdrawals').textContent = fmt(s.withdrawals);
+  document.getElementById('statPending').textContent = s.pending_deposits;
+  document.getElementById('statProfitPaid').textContent = fmt(s.total_profit_paid || 0);
+  document.getElementById('statTradesToday').textContent = s.trades_today || 0;
+  document.getElementById('statRefs').textContent = fmt(s.ref_commissions || 0);
+  document.getElementById('statRefCount').textContent = s.total_referrals || 0;
+
+  const dc = document.getElementById('navDepositCount');
+  if (s.pending_deposits > 0) { dc.textContent = s.pending_deposits; dc.style.display = 'inline-block'; }
+  else dc.style.display = 'none';
+
+  const wc = document.getElementById('navWithdrawCount');
+  if (s.pending_withdrawals > 0) { wc.textContent = s.pending_withdrawals; wc.style.display = 'inline-block'; }
+  else wc.style.display = 'none';
+
+  const dot = document.getElementById('schedDot');
+  const txt = document.getElementById('schedText');
+  if (s.scheduler_running) {
+    dot.classList.add('on');
+    txt.textContent = `Scheduler: running (${s.trades_today || 0} trades today)`;
+  } else {
+    dot.classList.remove('on');
+    txt.textContent = 'Scheduler: not running';
+  }
+}
+
+function buildCharts(transactions, clients) {
+  Chart.defaults.color = '#8b93a7';
+  Chart.defaults.borderColor = 'rgba(212, 175, 55, 0.12)';
+
+  const months = {};
+  transactions.filter(t => t.status === 'COMPLETED').forEach(t => {
+    const mo = (t.created_at || '').substring(0, 7);
+    if (!mo) return;
+    if (!months[mo]) months[mo] = { dep: 0, wdr: 0 };
+    if (t.type === 'DEPOSIT') months[mo].dep += t.amount_usd;
+    if (t.type === 'WITHDRAWAL' || t.type === 'REFERRAL_WITHDRAWAL') months[mo].wdr += t.amount_usd;
+  });
+  const moLabels = Object.keys(months).sort();
+  if (!moLabels.length) { moLabels.push(new Date().toISOString().substring(0, 7)); months[moLabels[0]] = { dep: 0, wdr: 0 }; }
+
+  if (txChart) txChart.destroy();
+  txChart = new Chart(document.getElementById('txChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: moLabels,
+      datasets: [
+        { label: 'Deposits', data: moLabels.map(m => months[m].dep), backgroundColor: 'rgba(74, 222, 128, 0.7)', borderRadius: 6 },
+        { label: 'Withdrawals', data: moLabels.map(m => months[m].wdr), backgroundColor: 'rgba(248, 113, 113, 0.7)', borderRadius: 6 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { labels: { color: '#8b93a7' } } },
+      scales: {
+        x: { grid: { color: 'rgba(212, 175, 55, 0.08)' } },
+        y: { ticks: { callback: v => '$' + fmt(v) }, grid: { color: 'rgba(212, 175, 55, 0.08)' } }
+      }
+    }
+  });
+
+  const days = {};
+  clients.forEach(c => { const d = (c.created_at || '').substring(0, 10); if (d) days[d] = (days[d] || 0) + 1; });
+  const dayLabels = Object.keys(days).sort();
+  let cum = 0;
+  const cumData = dayLabels.map(d => { cum += days[d]; return cum; });
+  if (!dayLabels.length) { dayLabels.push('Now'); cumData.push(0); }
+
+  if (clientChart) clientChart.destroy();
+  clientChart = new Chart(document.getElementById('clientChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: dayLabels,
+      datasets: [{
+        data: cumData, borderColor: '#d4af37', backgroundColor: 'rgba(212, 175, 55, 0.12)',
+        borderWidth: 2, pointRadius: 3, fill: true, tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(212, 175, 55, 0.08)' } },
+        y: { ticks: { stepSize: 1 }, grid: { color: 'rgba(212, 175, 55, 0.08)' } }
+      }
+    }
+  });
+}
+
+// PENDING DEPOSITS
+function renderPending(txData) {
+  const pending = txData.filter(t => t.type === 'DEPOSIT' && t.status === 'PENDING');
+  if (!pending.length) { setHTML('pendingList', '<div class="empty">✓ No pending deposits</div>'); return; }
+  let html = `<table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Amount</th><th>Method</th><th>Reference</th><th>Actions</th></tr></thead><tbody>`;
+  pending.forEach(t => {
+    storeTx(t);
+    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td style="color:var(--green);font-weight:bold;">$${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td style="font-size:11px;color:var(--muted);">${escHtml(t.reference || '—')}</td><td><div class="action-btns"><button class="btn-sm btn-green" onclick="openApproveModal('${t.id}')">✓ Approve</button><button class="btn-sm btn-danger" onclick="openRejectModal('${t.id}')">✗ Reject</button></div></td></tr>`;
+  });
+  html += '</tbody></table>';
+  setHTML('pendingList', html);
+}
+
+// PENDING WITHDRAWALS
+function renderPendingWithdrawals(txData) {
+  const pending = txData.filter(t => (t.type === 'WITHDRAWAL' || t.type === 'REFERRAL_WITHDRAWAL') && t.status === 'PENDING');
+  if (!pending.length) { setHTML('pendingWdrList', '<div class="empty">✓ No pending withdrawals</div>'); return; }
+  let html = `<table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Amount</th><th>Network</th><th>Address</th><th>Actions</th></tr></thead><tbody>`;
+  pending.forEach(t => {
+    storeTx(t);
+    const isRef = t.type === 'REFERRAL_WITHDRAWAL';
+    const typeLabel = isRef ? '🎁 Referral' : '💰 Account';
+    const fullAddress = t.deposit_address || '—';
+    const displayAddress = fullAddress.substring(0, 20) + (fullAddress.length > 20 ? '...' : '');
+    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td>${typeLabel}</td><td style="font-weight:bold;">$${fmt(t.amount_usd)}</td><td><span class="badge badge-info">${escHtml(t.method || '—')}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><span style="font-family:monospace;font-size:10px;color:var(--muted);">${displayAddress}</span>${fullAddress !== '—' ? `<button class="btn-sm btn-gold-soft" style="padding:4px 8px;font-size:10px;white-space:nowrap;" onclick="copyWdrAddress('${fullAddress}', this)">📋</button>` : ''}</div></td><td><div class="action-btns"><button class="btn-sm btn-green" onclick="openApproveWdrModal('${t.id}')">✓ Approve</button><button class="btn-sm btn-danger" onclick="openRejectWdrModal('${t.id}')">✗ Reject</button></div></td></tr>`;
+  });
+  html += '</tbody></table>';
+  setHTML('pendingWdrList', html);
+}
+
+// CLIENTS
+function renderClients(clients) {
+  const el = document.getElementById('clientList');
+  if (!clients || !clients.length) { setHTML(el, '<div class="empty">No clients yet</div>'); return; }
+  let html = `<table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Equity</th><th>Deposits</th><th>Withdrawals</th><th>Profit</th><th>Ref Earned</th><th>Days Active</th><th>Actions</th></tr></thead><tbody>`;
+  clients.forEach(c => {
+    storeClient(c);
+    html += `<tr><td><strong>${escHtml(c.name || '—')}</strong></td><td style="font-size:11px;color:var(--muted);">${escHtml(c.email || '—')}</td><td style="color:var(--green);font-weight:bold;">${fmtD(c.balance || 0)}</td><td style="color:var(--gold);">${fmtD(c.equity || 0)}</td><td>${fmtD(c.total_deposits || 0)}</td><td style="color:var(--red);">${fmtD(c.total_withdrawals || 0)}</td><td>${fmtD(c.total_profit || 0)}</td><td style="color:var(--gold);">${fmtD(c.total_ref_earned || 0)}</td><td style="text-align:center;">${c.days_active || 0}</td><td><div class="action-btns"><button class="btn-sm btn-gold-soft" onclick="openEditClientModal('${c.id}')">✏️ Edit</button><button class="btn-sm btn-danger" onclick="openDeleteClientModal('${c.id}', '${escHtml(c.name)}')">🗑️ Delete</button></div></td></tr>`;
+  });
+  html += '</tbody></table>';
+  setHTML(el, html);
+}
+
+function filterClients() {
+  const q = document.getElementById('clientSearch').value.toLowerCase();
+  renderClients(allClients.filter(c => (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q)));
+}
+
+// TRANSACTIONS
+function renderTx(txs) {
+  if (!txs || !txs.length) { setHTML('txList', '<div class="empty">No transactions</div>'); return; }
+  let html = `<table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th><th>Reference</th></tr></thead><tbody>`;
+  txs.forEach(t => {
+    storeTx(t);
+    const bc = t.status === 'COMPLETED' ? 'badge-success' : t.status === 'PENDING' ? 'badge-pending' : 'badge-danger';
+    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td>${(t.type || '').replace(/_/g, ' ')}</td><td style="font-weight:bold;">$${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td><span class="badge ${bc}">${t.status}</span></td><td style="font-size:11px;color:var(--muted);">${escHtml(t.reference || '—')}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  setHTML('txList', html);
+}
+
+function filterTx() {
+  const q = document.getElementById('txSearch').value.toLowerCase();
+  const type = document.getElementById('txTypeFilter').value;
+  const status = document.getElementById('txStatusFilter').value;
+  renderTx(allTx.filter(t =>
+    (!q || (t.user_name || '').toLowerCase().includes(q) || (t.reference || '').toLowerCase().includes(q)) &&
+    (!type || t.type === type) &&
+    (!status || t.status === status)
+  ));
+}
+
+// REFERRALS
+async function loadReferrals() {
+  setHTML('referralList', '<div class="loading">Loading...</div>');
+  const d = await api('/api/admin/referrals');
+  if (!d.success) { showError('Failed to load'); return; }
+  if (!d.data.length) { setHTML('referralList', '<div class="empty">No referrals</div>'); return; }
+  let html = `<table class="tbl"><thead><tr><th>Date</th><th>Referrer</th><th>Referred User</th><th>Commission</th><th>Status</th></tr></thead><tbody>`;
+  d.data.forEach(r => {
+    html += `<tr><td style="font-size:11px;color:var(--muted);">${(r.created_at || '').substring(0, 10)}</td><td><strong>${escHtml(r.referrer_name || '—')}</strong></td><td><strong>${escHtml(r.referred_name || '—')}</strong></td><td style="color:var(--green);font-weight:bold;">$${fmt(r.commission_usd)}</td><td><span class="badge badge-success">Credited</span></td></tr>`;
+  });
+  html += '</tbody></table>';
+  setHTML('referralList', html);
+}
+
+// TRADES
+async function loadTrades() {
+  setHTML('tradeList', '<div class="loading">Loading...</div>');
+  const status = document.getElementById('tradeStatusFilter').value;
+  const d = await api('/api/admin/trades' + (status ? '?status=' + status : ''));
+  if (!d.success) { showError('Failed to load'); return; }
+  if (!d.data.length) { setHTML('tradeList', '<div class="empty">No trades</div>'); return; }
+  let html = `<table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Symbol</th><th>Side</th><th>Entry</th><th>Close</th><th>P&L</th><th>Status</th></tr></thead><tbody>`;
+  d.data.forEach(t => {
+    const pnlColor = (t.pnl || 0) >= 0 ? 'var(--green)' : 'var(--red)';
+    html += `<tr><td style="font-size:11px;color:var(--muted);">${(t.opened_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td style="color:var(--gold);font-weight:bold;">${escHtml(t.symbol || '—')}</td><td>${t.direction === 'BUY' ? '📈' : '📉'} ${escHtml(t.direction || '—')}</td><td>$${fmt(t.entry_price)}</td><td>${t.close_price ? '$' + fmt(t.close_price) : 'Open'}</td><td style="color:${pnlColor};font-weight:bold;">${t.pnl != null ? (t.pnl >= 0 ? '+' : '') + fmt(t.pnl) : '—'}</td><td><span class="badge ${t.status === 'OPEN' ? 'badge-info' : 'badge-success'}">${t.status}</span></td></tr>`;
+  });
+  html += '</tbody></table>';
+  setHTML('tradeList', html);
+}
+
+// RUN TRADES NOW (receives the clicked button directly)
+async function runTradesNow(btn) {
+  const label = '▶ Run Trades Now';
+  btn.disabled = true;
+  btn.textContent = '⏳ Running...';
+  try {
+    const d = await post('/api/admin/trade/run', {});
+    if (!d.success) { showError(d.error); return; }
+    showSuccess('Trades completed!');
+    await refreshData();
+  } catch (e) {
+    showError('Failed to run trades: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+// ADJUST BALANCE
+const adjustFieldLabels = { balance: 'Balance', equity: 'Equity', total_deposits: 'Total Deposits', total_withdrawals: 'Total Withdrawals', total_profit: 'Trade Profit', total_ref_earned: 'Referral Earnings' };
+const TX_CREATING_FIELDS = ['total_deposits', 'total_withdrawals'];
+
+function populateAdjustClients() {
+  const sel = document.getElementById('adjustClient');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select client —</option>';
+  allClients.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name} (${c.email}) — $${fmt(c.balance)}`;
+    if (c.id === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  updateAdjustCurrentValue();
+}
+
+function updateAdjustCurrentValue() {
+  const uid = document.getElementById('adjustClient').value;
+  const field = document.getElementById('adjustField').value;
+  const el = document.getElementById('adjustCurrentVal');
+  const c = _clientMap[uid];
+
+  const isTxField = TX_CREATING_FIELDS.includes(field);
+  document.getElementById('adjustMethodGroup').style.display = isTxField ? 'block' : 'none';
+  document.getElementById('adjustAmountLabel').textContent = isTxField
+    ? 'Amount (positive number — a real transaction record is created)'
+    : 'Amount (positive = add, negative = subtract)';
+  document.getElementById('adjustAmount').placeholder = isTxField ? 'e.g. 500' : 'e.g. 500 or -200';
+
+  if (!c) { el.textContent = 'Current value: —'; return; }
+  const val = parseFloat(c[field] || 0);
+  el.textContent = `Current ${adjustFieldLabels[field]}: ${fmtD(val)}`;
+}
+
+async function submitAdjust() {
+  const uid = document.getElementById('adjustClient').value;
+  const field = document.getElementById('adjustField').value;
+  const amount = parseFloat(document.getElementById('adjustAmount').value || 0);
+  const note = document.getElementById('adjustNote').value.trim();
+
+  if (!uid) { showError('Select a client', 'adjustError'); return; }
+  if (!amount) { showError('Enter an amount', 'adjustError'); return; }
+  if (!note) { showError('Enter a reason', 'adjustError'); return; }
+
+  let d;
+  if (field === 'total_deposits') {
+    if (amount <= 0) { showError('Deposit amount must be a positive number', 'adjustError'); return; }
+    const method = document.getElementById('adjustMethod').value;
+    d = await post(`/api/admin/client/${uid}/create-deposit-tx`, { amount, method, note });
+  } else if (field === 'total_withdrawals') {
+    if (amount <= 0) { showError('Withdrawal amount must be a positive number', 'adjustError'); return; }
+    const method = document.getElementById('adjustMethod').value;
+    d = await post(`/api/admin/client/${uid}/create-withdrawal-tx`, { amount, method, note });
+  } else {
+    d = await post(`/api/admin/client/${uid}/adjust`, { amount, note });
+  }
+
+  if (!d.success) { showError(d.error, 'adjustError'); return; }
+  showSuccess(d.data.message, 'adjustSuccess');
+  document.getElementById('adjustAmount').value = '';
+  document.getElementById('adjustNote').value = '';
+  await refreshData();
+  updateAdjustCurrentValue();
+}
+
+// REFERRAL CREATION
+function populateRefReferrers() {
+  const sel = document.getElementById('refReferrer');
+  sel.innerHTML = '<option value="">— Select a referrer —</option>';
+  allClients.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name} (${c.email})`;
+    sel.appendChild(opt);
+  });
+}
+
+function populateRefReferred() {
+  const sel = document.getElementById('refReferred');
+  sel.innerHTML = '<option value="">— Select client to refer —</option>';
+  allClients.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name} (${c.email}) — $${fmt(c.balance)}`;
+    sel.appendChild(opt);
+  });
+}
+
+function onReferrerChange() { populateRefReferred(); }
+
+function onRefModeChange() {
+  const mode = document.querySelector('input[name="refMode"]:checked').value;
+  document.getElementById('existingClientMode').style.display = mode === 'existing' ? 'block' : 'none';
+  document.getElementById('newMemberMode').style.display = mode === 'new' ? 'block' : 'none';
+}
+
+function onRefDepositToggle() {
+  const checked = document.getElementById('refCreateDeposit').checked;
+  document.getElementById('refDepositSection').style.display = checked ? 'block' : 'none';
+}
+
+async function submitReferral() {
+  const referrer_id = document.getElementById('refReferrer').value;
+  const mode = document.querySelector('input[name="refMode"]:checked').value;
+  const create_deposit = document.getElementById('refCreateDeposit').checked;
+  const deposit_amount = parseFloat(document.getElementById('refDepositAmount').value || 0);
+  const deposit_method = document.getElementById('refDepositMethod').value;
+  const note = document.getElementById('refNote').value.trim();
+
+  document.getElementById('refError').classList.remove('show');
+  document.getElementById('refSuccess').classList.remove('show');
+
+  if (!referrer_id) { showError('Select a referrer', 'refError'); return; }
+  if (create_deposit && deposit_amount <= 0) { showError('Deposit amount must be greater than 0', 'refError'); return; }
+
+  let d;
+  if (mode === 'existing') {
+    const referred_id = document.getElementById('refReferred').value;
+    if (!referred_id) { showError('Select a referred client', 'refError'); return; }
+    d = await post('/api/admin/create-referral', { referrer_id, referred_id, note, create_deposit, deposit_amount, deposit_method });
+  } else {
+    const name = document.getElementById('refNewName').value.trim();
+    const email = document.getElementById('refNewEmail').value.trim();
+    const phone = document.getElementById('refNewPhone').value.trim();
+    const password = document.getElementById('refNewPassword').value;
+
+    if (!name) { showError('Enter member name', 'refError'); return; }
+    if (!email) { showError('Enter email address', 'refError'); return; }
+    if (!password) { showError('Enter password (min 6 chars)', 'refError'); return; }
+    if (password.length < 6) { showError('Password must be at least 6 characters', 'refError'); return; }
+
+    d = await post('/api/admin/create-referral-member', { referrer_id, name, email, phone, password, note, create_deposit, deposit_amount, deposit_method });
+  }
+
+  if (!d.success) { showError(d.error, 'refError'); return; }
+  showSuccess(d.data.message, 'refSuccess');
+
+  ['refReferrer', 'refReferred', 'refNewName', 'refNewEmail', 'refNewPhone', 'refNewPassword', 'refDepositAmount', 'refNote']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('refCreateDeposit').checked = false;
+  document.getElementById('refDepositSection').style.display = 'none';
+
+  await refreshData();
+}
+
+// MODALS
+function openApproveModal(txId) {
+  const t = _txMap[txId];
+  if (!t) return;
+  document.getElementById('modalTxId').value = txId;
+  document.getElementById('modalClientName').textContent = t.user_name || '—';
+  document.getElementById('modalAmount').textContent = '$' + fmt(t.amount_usd);
+  document.getElementById('modalNetwork').textContent = t.method || '—';
+  document.getElementById('modalRef').textContent = t.reference || '—';
+  document.getElementById('approveModal').classList.add('show');
+}
+
+function openRejectModal(txId) {
+  const t = _txMap[txId];
+  if (!t) return;
+  document.getElementById('rejectTxId').value = txId;
+  document.getElementById('rejectReason').value = '';
+  document.getElementById('rejectModal').classList.add('show');
+}
+
+function openApproveWdrModal(txId) {
+  const t = _txMap[txId];
+  if (!t) return;
+  document.getElementById('wdrModalTxId').value = txId;
+  document.getElementById('wdrModalClientName').textContent = t.user_name || '—';
+  document.getElementById('wdrModalAmount').textContent = '$' + fmt(t.amount_usd);
+  document.getElementById('wdrModalNetwork').textContent = t.method || '—';
+  document.getElementById('wdrModalAddress').textContent = t.deposit_address || '—';
+  document.getElementById('approveWdrModal').classList.add('show');
+}
+
+function openRejectWdrModal(txId) {
+  const t = _txMap[txId];
+  if (!t) return;
+  document.getElementById('rejectWdrTxId').value = txId;
+  document.getElementById('rejectWdrReason').value = '';
+  document.getElementById('rejectWdrModal').classList.add('show');
+}
+
+function openEditClientModal(uid) {
+  const c = _clientMap[uid];
+  if (!c) return;
+  document.getElementById('editClientId').value = uid;
+  document.getElementById('editClientName').value = c.name || '';
+  document.getElementById('editClientEmail').value = c.email || '';
+  document.getElementById('editClientPhone').value = c.phone || '';
+  document.getElementById('editClientErr').classList.remove('show');
+  document.getElementById('editClientOk').classList.remove('show');
+  document.getElementById('editClientModal').classList.add('show');
+}
+
+function openDeleteClientModal(uid, name) {
+  const c = _clientMap[uid];
+  if (!c) return;
+  document.getElementById('deleteClientId').value = uid;
+  document.getElementById('deleteClientName').textContent = name;
+  document.getElementById('deleteClientErr').textContent = '';
+  document.getElementById('deleteClientErr').classList.remove('show');
+  document.getElementById('deleteClientModal').classList.add('show');
+}
+
+async function confirmDeleteClient() {
+  const uid = document.getElementById('deleteClientId').value;
+  const d = await post(`/api/admin/client/${uid}/delete`, { confirm: true });
+  if (!d.success) {
+    document.getElementById('deleteClientErr').textContent = '✗ ' + d.error;
+    document.getElementById('deleteClientErr').classList.add('show');
+    return;
+  }
+  closeModal('deleteClientModal');
+  showSuccess(d.data.message);
+  await refreshData();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); });
+});
+
+async function confirmApprove() {
+  const txId = document.getElementById('modalTxId').value;
+  const d = await post('/api/admin/deposit/approve', { tx_id: txId });
+  closeModal('approveModal');
+  if (!d.success) { showError(d.error); return; }
+  showSuccess(d.data.message);
+  await refreshData();
+}
+
+async function confirmReject() {
+  const txId = document.getElementById('rejectTxId').value;
+  const reason = document.getElementById('rejectReason').value.trim() || 'Rejected by admin';
+  const d = await post('/api/admin/deposit/reject', { tx_id: txId, reason });
+  closeModal('rejectModal');
+  if (!d.success) { showError(d.error); return; }
+  showSuccess('Deposit rejected');
+  await refreshData();
+}
+
+async function confirmWdrApprove() {
+  const txId = document.getElementById('wdrModalTxId').value;
+  const d = await post('/api/admin/withdrawal/approve', { tx_id: txId });
+  closeModal('approveWdrModal');
+  if (!d.success) { showError(d.error); return; }
+  showSuccess('Withdrawal approved');
+  await refreshData();
+}
+
+async function confirmWdrReject() {
+  const txId = document.getElementById('rejectWdrTxId').value;
+  const reason = document.getElementById('rejectWdrReason').value.trim() || 'Rejected by admin';
+  const d = await post('/api/admin/withdrawal/reject', { tx_id: txId, reason });
+  closeModal('rejectWdrModal');
+  if (!d.success) { showError(d.error); return; }
+  showSuccess('Withdrawal rejected');
+  await refreshData();
+}
+
+async function saveClientEdit() {
+  const uid = document.getElementById('editClientId').value;
+  const name = document.getElementById('editClientName').value.trim();
+  const email = document.getElementById('editClientEmail').value.trim();
+  const phone = document.getElementById('editClientPhone').value.trim();
+  if (!name || !email) { showError('Name and email required', 'editClientErr'); return; }
+  const d = await post(`/api/admin/client/${uid}/edit`, { name, email, phone });
+  if (!d.success) { showError(d.error, 'editClientErr'); return; }
+  closeModal('editClientModal');
+  showSuccess('Client updated');
+  await refreshData();
+}
+
+async function refreshData() {
+  await loadStats();
+  const [txRes, clientRes] = await Promise.all([
+    api('/api/admin/transactions'),
+    api('/api/admin/clients'),
+  ]);
+  if (txRes.success) { allTx = txRes.data; allTx.forEach(storeTx); }
+  if (clientRes.success) { allClients = clientRes.data; allClients.forEach(storeClient); }
+
+  if (activeTab === 'deposits') renderPending(allTx);
+  if (activeTab === 'withdrawals') renderPendingWithdrawals(allTx);
+  if (activeTab === 'clients') renderClients(allClients);
+  if (activeTab === 'transactions') renderTx(allTx);
+  if (activeTab === 'dashboard') buildCharts(allTx, allClients);
+  if (activeTab === 'adjust') { populateAdjustClients(); populateRefReferrers(); populateRefReferred(); }
+}
+
+async function init() {
+  await loadStats();
+  const [txRes, clientRes] = await Promise.all([
+    api('/api/admin/transactions'),
+    api('/api/admin/clients'),
+  ]);
+  if (txRes.success) { allTx = txRes.data; allTx.forEach(storeTx); }
+  if (clientRes.success) { allClients = clientRes.data; allClients.forEach(storeClient); }
+
+  renderPending(allTx);
+  buildCharts(allTx, allClients);
+  populateAdjustClients();
+  populateRefReferrers();
+  populateRefReferred();
+
+  setInterval(refreshData, 60000);
+}
+
+init();
+</script>
+</body>
+</html>

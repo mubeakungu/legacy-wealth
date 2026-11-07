@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: legacywealth
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: ""
+      - key: BINANCE_API_KEY
+        value: ""
+      - key: BINANCE_API_SECRET
+        value: ""
+      - key: WALLET_TRC20
+        value: ""
+      - key: WALLET_BEP20
+        value: ""
+      - key: WALLET_ERC20
+        value: ""
+      - key: BINANCE_WALLET_ADDRESS
+        value: ""

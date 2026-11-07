@@ -1,0 +1,544 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Wealth - Sign In</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-green: #27ae60;
+      --green-light: #2ecc71;
+      --light-bg: #ffffff;
+      --card-bg: #f5f5f5;
+      --field-bg: #ffffff;
+      --accent-green: #27ae60;
+      --accent-red: #ff5c5c;
+      --text-dark: #1a1a1a;
+      --text-muted: #666666;
+      --border-subtle: rgba(39, 174, 96, 0.18);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at top, #f0f0f0 0%, #ffffff 55%, #f0f0f0 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(39, 174, 96, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.96));
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 48px 44px 40px;
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(39, 174, 96, 0.08);
+      transition: border-color 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(39, 174, 96, 0.32);
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .logo-image {
+      max-width: 88px;
+      height: auto;
+      margin-bottom: 18px;
+      filter: drop-shadow(0 0 15px rgba(39, 174, 96, 0.3));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .brand-name {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+
+    .brand-tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 15px;
+      color: var(--text-dark);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .subtitle-sub {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error {
+      background: rgba(255, 92, 92, 0.1);
+      border: 1px solid rgba(255, 92, 92, 0.3);
+      color: var(--accent-red);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--border-subtle);
+      background: var(--field-bg);
+      color: var(--text-dark);
+      border-radius: 9px;
+      font-size: 14px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      font-family: inherit;
+    }
+
+    .field-wrap input {
+      padding-right: 44px;
+    }
+
+    input::placeholder {
+      color: rgba(143, 147, 171, 0.55);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      background: #0c1030;
+      box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+    }
+
+    input.field-invalid {
+      border-color: rgba(255, 92, 92, 0.55);
+    }
+
+    .toggle-visibility {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .toggle-visibility:hover {
+      color: var(--primary-green);
+    }
+
+    .toggle-visibility svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 12px;
+      margin-top: 8px;
+      margin-bottom: 6px;
+    }
+
+    .forgot-link a {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link a:hover {
+      color: var(--green-light);
+      text-decoration: underline;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      color: #ffffff;
+      border: none;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 24px rgba(39, 174, 96, 0.28);
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--green-light), var(--primary-green));
+      box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(10, 14, 39, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .signup-link a {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    .signup-link a:hover {
+      color: var(--green-light);
+      text-decoration: underline;
+    }
+
+    .divider {
+      color: var(--text-muted);
+      margin: 0 8px;
+      opacity: 0.5;
+    }
+
+    .admin-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .admin-link:hover {
+      color: var(--primary-green);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 36px 24px 32px;
+        border-radius: 14px;
+      }
+
+      .brand-name {
+        font-size: 24px;
+      }
+
+      .logo-image {
+        max-width: 72px;
+      }
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--primary-green);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo-image { animation: none; }
+      .btn, .card, input, .toggle-visibility { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo-section">
+        <img src="/static/logo.png" alt="Legacy Wealth" class="logo-image">
+        <div class="brand-name">Legacy Wealth</div>
+        <div class="brand-tagline">Trade Global • Invest Smart • Grow With Confidence</div>
+      </div>
+
+      <div class="subtitle">Welcome back</div>
+      <div class="subtitle-sub">Sign in to your trading account</div>
+
+      <div class="alert error" id="err" role="alert"></div>
+
+      <form id="loginForm" method="POST" novalidate>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="john@example.com" 
+            autocomplete="email" 
+            required 
+            autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="field-wrap">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="••••••••" 
+              autocomplete="current-password" 
+              required>
+            <button type="button" class="toggle-visibility" data-target="password" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn" id="loginBtn">
+          <span id="btnLabel">Sign in</span>
+          <span class="spinner" id="btnSpinner"></span>
+        </button>
+      </form>
+
+      <p class="signup-link">
+        <a href="/register">Sign up</a>
+        <span class="divider">|</span>
+        <a href="/admin" class="admin-link">Admin</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Debug: Log when script loads
+    console.log('Login script initialized');
+
+    // Get DOM elements
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorEl = document.getElementById('err');
+    const loginBtn = document.getElementById('loginBtn');
+    const btnLabel = document.getElementById('btnLabel');
+    const btnSpinner = document.getElementById('btnSpinner');
+
+    // Debug: Verify all elements exist
+    console.log('Form element:', form);
+    console.log('Email input:', emailInput);
+    console.log('Password input:', passwordInput);
+
+    if (!form) {
+      console.error('ERROR: Login form not found!');
+      errorEl.textContent = '✗ Form initialization error. Please refresh the page.';
+      errorEl.style.display = 'flex';
+    }
+
+    // Password visibility toggle
+    document.querySelectorAll('.toggle-visibility').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('data-target');
+        const target = document.getElementById(targetId);
+        if (target) {
+          const isPassword = target.type === 'password';
+          target.type = isPassword ? 'text' : 'password';
+          this.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        }
+      });
+    });
+
+    // Clear error on input
+    emailInput.addEventListener('input', () => {
+      emailInput.classList.remove('field-invalid');
+      errorEl.style.display = 'none';
+    });
+
+    passwordInput.addEventListener('input', () => {
+      passwordInput.classList.remove('field-invalid');
+      errorEl.style.display = 'none';
+    });
+
+    function showError(message) {
+      console.error('Error:', message);
+      errorEl.textContent = '✗ ' + message;
+      errorEl.style.display = 'flex';
+    }
+
+    function setLoading(isLoading) {
+      loginBtn.disabled = isLoading;
+      btnLabel.textContent = isLoading ? 'Signing in…' : 'Sign in';
+      btnSpinner.style.display = isLoading ? 'inline-block' : 'none';
+    }
+
+    // MAIN FORM SUBMISSION HANDLER
+    form.addEventListener('submit', async function(e) {
+      console.log('Form submitted');
+      e.preventDefault(); // CRITICAL: Stop form from doing GET request
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      console.log('Attempting login with email:', email);
+
+      // Validate
+      if (!email || !password) {
+        showError('Please enter email and password');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        console.log('Sending POST request to /api/auth/login');
+        
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            admin: false
+          })
+        });
+
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (response.ok && data.success) {
+          console.log('Login successful, redirecting to:', data.data.redirect);
+          window.location.href = data.data.redirect;
+        } else {
+          showError(data.error || 'Login failed. Please try again.');
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        showError('Connection error: ' + error.message);
+        setLoading(false);
+      }
+    });
+
+    // Allow Enter key to submit
+    form.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && e.target !== loginBtn) {
+        console.log('Enter key pressed');
+        form.dispatchEvent(new Event('submit'));
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+

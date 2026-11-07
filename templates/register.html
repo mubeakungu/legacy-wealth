@@ -1,0 +1,692 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Wealth - Create Account</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-green: #27ae60;
+      --green-light: #2ecc71;
+      --light-bg: #ffffff;
+      --card-bg: #f5f5f5;
+      --field-bg: #ffffff;
+      --accent-green: #27ae60;
+      --accent-red: #ff5c5c;
+      --text-dark: #1a1a1a;
+      --text-muted: #666666;
+      --border-subtle: rgba(39, 174, 96, 0.18);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at top, #f0f0f0 0%, #ffffff 55%, #f0f0f0 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(39, 174, 96, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.96));
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px 32px 28px;
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(39, 174, 96, 0.08);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(39, 174, 96, 0.32);
+    }
+
+    /* Referral Banner */
+    .referral-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(0, 255, 65, 0.08), rgba(39, 174, 96, 0.08));
+      border: 1px solid rgba(0, 255, 65, 0.3);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 18px;
+      text-align: center;
+      animation: slideIn 0.3s ease;
+    }
+
+    .referral-banner.active {
+      display: block;
+    }
+
+    .referral-banner-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+
+    .referral-banner-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+
+    .referral-code-display {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      word-break: break-all;
+    }
+
+    /* Logo Section */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .logo-image {
+      max-width: 64px;
+      height: auto;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 15px rgba(39, 174, 96, 0.3));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .brand-name {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .brand-tagline {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-dark);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .subtitle-sub {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error {
+      background: rgba(255, 92, 92, 0.1);
+      border: 1px solid rgba(255, 92, 92, 0.3);
+      color: var(--accent-red);
+    }
+
+    .success {
+      background: rgba(0, 255, 65, 0.1);
+      border: 1px solid rgba(0, 255, 65, 0.3);
+      color: var(--accent-green);
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .form-row .form-group {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--field-bg);
+      color: var(--text-dark);
+      border-radius: 8px;
+      font-size: 13px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      font-family: inherit;
+    }
+
+    .field-wrap input {
+      padding-right: 40px;
+    }
+
+    input::placeholder {
+      color: rgba(143, 147, 171, 0.5);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      background: #0c1030;
+      box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+    }
+
+    input.field-invalid {
+      border-color: rgba(255, 92, 92, 0.55);
+    }
+
+    .toggle-visibility {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .toggle-visibility:hover {
+      color: var(--primary-green);
+    }
+
+    .toggle-visibility svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 24px rgba(39, 174, 96, 0.28);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--green-light), var(--primary-green));
+      box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0px);
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(10, 14, 39, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Links */
+    .login-link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .login-link a {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    .login-link a:hover {
+      color: var(--green-light);
+      text-decoration: underline;
+    }
+
+    /* Terms */
+    .terms {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .terms a {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .terms a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .card {
+        padding: 24px 20px 20px;
+        border-radius: 12px;
+        max-width: 100%;
+      }
+
+      .brand-name {
+        font-size: 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+
+      .logo-image {
+        max-width: 56px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+    }
+
+    /* Accessibility: visible focus for keyboard users */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--primary-green);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo-image { animation: none; }
+      .btn, .card, input, .toggle-visibility { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <!-- Logo Section -->
+      <div class="logo-section">
+        <img src="/static/logo.png" alt="Legacy Wealth" class="logo-image">
+        <div class="brand-name">Legacy Wealth</div>
+        <div class="brand-tagline">Trade Global • Invest Smart • Grow With Confidence</div>
+      </div>
+
+      <!-- Referral Banner -->
+      <div class="referral-banner" id="refBanner">
+        <div class="referral-banner-label">✓ Referred by</div>
+        <div class="referral-banner-text" id="referrerName">Loading...</div>
+        <div class="referral-code-display">Code: <span id="refCodeDisplay"></span></div>
+      </div>
+
+      <div class="subtitle">Create your account</div>
+      <div class="subtitle-sub">Get started in seconds</div>
+
+      <!-- Alerts -->
+      <div class="alert error" id="err" role="alert"></div>
+      <div class="alert success" id="succ" role="status"></div>
+
+      <form id="registerForm" novalidate>
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" placeholder="John Doe" autocomplete="name" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="john@example.com" autocomplete="email" required>
+        </div>
+
+        <!-- Phone & PIN Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" placeholder="+254 712 345678" autocomplete="tel" required>
+          </div>
+          <div class="form-group">
+            <label for="pin">PIN (6 digits)</label>
+            <input type="password" id="pin" name="pin" placeholder="••••••" inputmode="numeric" maxlength="6" autocomplete="off" required>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="pass">Password</label>
+          <div class="field-wrap">
+            <input type="password" id="pass" name="password" placeholder="Min. 8 characters" autocomplete="new-password" required>
+            <button type="button" class="toggle-visibility" data-target="pass" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="pass2">Confirm password</label>
+          <div class="field-wrap">
+            <input type="password" id="pass2" name="password2" placeholder="Confirm your password" autocomplete="new-password" required>
+            <button type="button" class="toggle-visibility" data-target="pass2" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hidden referral code field -->
+        <input type="hidden" id="refCode" name="ref_code" value="">
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn" id="registerBtn">
+          <span id="btnLabel">Create account</span>
+          <span class="spinner" id="btnSpinner"></span>
+        </button>
+      </form>
+
+      <!-- Terms -->
+      <div class="terms">
+        By creating an account, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
+      </div>
+
+      <!-- Login Link -->
+      <p class="login-link">
+        Already have an account? <a href="/">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('registerForm');
+      const errEl = document.getElementById('err');
+      const succEl = document.getElementById('succ');
+      const btnEl = document.getElementById('registerBtn');
+      const btnLabel = document.getElementById('btnLabel');
+      const btnSpinner = document.getElementById('btnSpinner');
+      const refCodeInput = document.getElementById('refCode');
+      const refBanner = document.getElementById('refBanner');
+      const referrerNameEl = document.getElementById('referrerName');
+      const refCodeDisplay = document.getElementById('refCodeDisplay');
+
+      const fields = {
+        name: document.getElementById('name'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone'),
+        pin: document.getElementById('pin'),
+        pass: document.getElementById('pass'),
+        pass2: document.getElementById('pass2')
+      };
+
+      // ── Extract ref code from URL ──────────────────────────────────────────
+      function getUrlParam(param) {
+        const searchParams = new URLSearchParams(window.location.search);
+        return searchParams.get(param) || '';
+      }
+
+      function loadReferralInfo() {
+        const refCode = getUrlParam('ref');
+        if (!refCode) return;
+
+        refCodeInput.value = refCode;
+        refCodeDisplay.textContent = refCode;
+
+        // Attempt to fetch referrer details from backend
+        fetch(`/api/referral/info?code=${encodeURIComponent(refCode)}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.success && data.data && data.data.referrer_name) {
+              referrerNameEl.textContent = data.data.referrer_name;
+              refBanner.classList.add('active');
+            } else {
+              // Code valid but no name available; show code anyway
+              referrerNameEl.textContent = 'Member #' + refCode.substring(0, 4);
+              refBanner.classList.add('active');
+            }
+          })
+          .catch(err => {
+            // Silent fail — show banner with code
+            referrerNameEl.textContent = 'Member #' + refCode.substring(0, 4);
+            refBanner.classList.add('active');
+          });
+      }
+
+      loadReferralInfo();
+
+      // Password visibility toggles
+      document.querySelectorAll('.toggle-visibility').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = document.getElementById(btn.dataset.target);
+          const isHidden = target.type === 'password';
+          target.type = isHidden ? 'text' : 'password';
+          btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        });
+      });
+
+      // Clear invalid state as the user types
+      Object.values(fields).forEach(f => {
+        f.addEventListener('input', () => f.classList.remove('field-invalid'));
+      });
+
+      // Digits-only PIN
+      fields.pin.addEventListener('input', () => {
+        fields.pin.value = fields.pin.value.replace(/\D/g, '').slice(0, 6);
+      });
+
+      function showError(message, invalidFields = []) {
+        errEl.textContent = '✗ ' + message;
+        errEl.style.display = 'flex';
+        succEl.style.display = 'none';
+        invalidFields.forEach(f => fields[f].classList.add('field-invalid'));
+      }
+
+      function clearAlerts() {
+        errEl.style.display = 'none';
+        succEl.style.display = 'none';
+      }
+
+      function setLoading(isLoading) {
+        btnEl.disabled = isLoading;
+        btnLabel.textContent = isLoading ? 'Creating account…' : 'Create account';
+        btnSpinner.style.display = isLoading ? 'inline-block' : 'none';
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlerts();
+
+        const name = fields.name.value.trim();
+        const email = fields.email.value.trim();
+        const phone = fields.phone.value.trim();
+        const pin = fields.pin.value;
+        const pass = fields.pass.value;
+        const pass2 = fields.pass2.value;
+        const ref_code = refCodeInput.value;
+
+        if (!name || !email || !phone || !pin || !pass || !pass2) {
+          const missing = Object.keys(fields).filter(k => !fields[k].value.trim());
+          showError('All fields are required', missing);
+          return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showError('Please enter a valid email address', ['email']);
+          return;
+        }
+
+        if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+          showError('PIN must be exactly 6 digits', ['pin']);
+          return;
+        }
+
+        if (pass.length < 8) {
+          showError('Password must be at least 8 characters', ['pass']);
+          return;
+        }
+
+        if (pass !== pass2) {
+          showError('Passwords do not match', ['pass', 'pass2']);
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const r = await fetch('/api/auth/register', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name,
+              email,
+              phone,
+              pin,
+              password: pass,
+              ref_code: ref_code,
+              admin: false
+            })
+          });
+
+          const d = await r.json();
+
+          if (r.ok && d.success) {
+            succEl.textContent = '✓ Account created successfully. Redirecting…';
+            succEl.style.display = 'flex';
+            setTimeout(() => { window.location = '/'; }, 1800);
+          } else {
+            showError(d.error || 'Registration failed. Please try again.');
+            setLoading(false);
+          }
+        } catch (err) {
+          showError('Connection error. Please check your network and try again.');
+          setLoading(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+
+
+

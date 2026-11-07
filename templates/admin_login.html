@@ -1,0 +1,440 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Wealth - Admin Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-green: #27ae60;
+      --green-light: #2ecc71;
+      --light-bg: #ffffff;
+      --card-bg: #f5f5f5;
+      --field-bg: #ffffff;
+      --accent-red: #ff5c5c;
+      --text-dark: #1a1a1a;
+      --text-muted: #666666;
+      --border-subtle: rgba(39, 174, 96, 0.18);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at top, #f0f0f0 0%, #ffffff 55%, #f0f0f0 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(39, 174, 96, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.96));
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px 32px 28px;
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(39, 174, 96, 0.08);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: rgba(39, 174, 96, 0.32);
+    }
+
+    /* Admin Badge */
+    .admin-badge {
+      position: absolute;
+      top: -10px;
+      right: 24px;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
+    /* Logo Section */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .logo-image {
+      max-width: 64px;
+      height: auto;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 15px rgba(39, 174, 96, 0.3));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .brand-name {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .brand-tagline {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-dark);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .subtitle-sub {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error {
+      background: rgba(255, 92, 92, 0.1);
+      border: 1px solid rgba(255, 92, 92, 0.3);
+      color: var(--accent-red);
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--field-bg);
+      color: var(--text-dark);
+      border-radius: 8px;
+      font-size: 13px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      font-family: inherit;
+    }
+
+    input::placeholder {
+      color: rgba(143, 147, 171, 0.5);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      background: #0c1030;
+      box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 24px rgba(39, 174, 96, 0.28);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--green-light), var(--primary-green));
+      box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0px);
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(10, 14, 39, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Links */
+    .back-link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .back-link a {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    .back-link a:hover {
+      color: var(--green-light);
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .card {
+        padding: 24px 20px 20px;
+        border-radius: 12px;
+        max-width: 100%;
+      }
+
+      .brand-name {
+        font-size: 20px;
+      }
+
+      .logo-image {
+        max-width: 56px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      .admin-badge {
+        right: 16px;
+      }
+    }
+
+    /* Accessibility: visible focus for keyboard users */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--primary-green);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo-image { animation: none; }
+      .btn, .card, input { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="admin-badge">ADMIN</div>
+
+      <!-- Logo Section -->
+      <div class="logo-section">
+        <img src="/static/logo.png" alt="Legacy Wealth" class="logo-image">
+        <div class="brand-name">Legacy Wealth</div>
+        <div class="brand-tagline">Trade Global • Invest Smart • Grow With Confidence</div>
+      </div>
+
+      <div class="subtitle">Administrator Access</div>
+      <div class="subtitle-sub">Secure login for admins only</div>
+
+      <!-- Alert -->
+      <div class="alert error" id="err" role="alert"></div>
+
+      <!-- Form -->
+      <form id="loginForm" novalidate>
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="admin@legacywealth.com" autocomplete="email" required autofocus>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="pass">Password</label>
+          <input type="password" id="pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn" id="loginBtn">
+          <span id="btnLabel">Sign in</span>
+          <span class="spinner" id="btnSpinner"></span>
+        </button>
+      </form>
+
+      <!-- Back Link -->
+      <p class="back-link">
+        <a href="/">← Back to client login</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('loginForm');
+      const errEl = document.getElementById('err');
+      const btnEl = document.getElementById('loginBtn');
+      const btnLabel = document.getElementById('btnLabel');
+      const btnSpinner = document.getElementById('btnSpinner');
+      const emailInput = document.getElementById('email');
+      const passInput = document.getElementById('pass');
+
+      function clearAlert() {
+        errEl.style.display = 'none';
+      }
+
+      function showError(message) {
+        errEl.textContent = '✗ ' + message;
+        errEl.style.display = 'flex';
+      }
+
+      function setLoading(isLoading) {
+        btnEl.disabled = isLoading;
+        btnLabel.textContent = isLoading ? 'Signing in…' : 'Sign in';
+        btnSpinner.style.display = isLoading ? 'inline-block' : 'none';
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlert();
+
+        const email = emailInput.value.trim();
+        const password = passInput.value;
+
+        if (!email || !password) {
+          showError('Please enter your email and password.');
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const r = await fetch('/api/auth/login', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              password,
+              admin: true
+            })
+          });
+
+          const d = await r.json();
+
+          if (d.success) {
+            window.location = d.data.redirect;
+          } else {
+            showError(d.error || 'Login failed. Please try again.');
+            setLoading(false);
+          }
+        } catch (err) {
+          showError('Network error. Please check your connection and try again.');
+          setLoading(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+
+
+
