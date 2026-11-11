@@ -477,12 +477,12 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Deposits</div>
-          <div class="stat-value">$<span id="statDeposits">0.00</span></div>
+          <div class="stat-value">KSH <span id="statDeposits">0.00</span></div>
           <div class="stat-sub">Completed</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Withdrawals</div>
-          <div class="stat-value">$<span id="statWithdrawals">0.00</span></div>
+          <div class="stat-value">KSH <span id="statWithdrawals">0.00</span></div>
           <div class="stat-sub">Completed</div>
         </div>
         <div class="stat-card">
@@ -492,12 +492,12 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Profit Paid</div>
-          <div class="stat-value" style="color:var(--green);">$<span id="statProfitPaid">0.00</span></div>
+          <div class="stat-value" style="color:var(--green);">KSH <span id="statProfitPaid">0.00</span></div>
           <div class="stat-sub"><span id="statTradesToday">0</span> trades today</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Referral Commissions</div>
-          <div class="stat-value">$<span id="statRefs">0.00</span></div>
+          <div class="stat-value">KSH <span id="statRefs">0.00</span></div>
           <div class="stat-sub"><span id="statRefCount">0</span> referrals</div>
         </div>
       </div>
@@ -713,7 +713,7 @@
 
           <div id="refDepositSection" style="display:none;">
             <div class="form-group">
-              <label>Deposit Amount (USD)</label>
+              <label>Deposit Amount (KSH)</label>
               <input type="number" id="refDepositAmount" placeholder="e.g. 500" min="0">
             </div>
             <div class="form-group">
@@ -864,7 +864,7 @@
 const api  = (url, opts = {}) => fetch(url, { credentials: 'same-origin', ...opts }).then(r => r.json());
 const post = (u, b) => api(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
 const fmt  = n => parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const fmtD = n => '$' + fmt(n);
+const fmtD = n => 'KSH ' + fmt(n);
 
 function escHtml(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1031,7 +1031,7 @@ function buildCharts(transactions, clients) {
       plugins: { legend: { labels: { color: '#8b93a7' } } },
       scales: {
         x: { grid: { color: 'rgba(212, 175, 55, 0.08)' } },
-        y: { ticks: { callback: v => '$' + fmt(v) }, grid: { color: 'rgba(212, 175, 55, 0.08)' } }
+        y: { ticks: { callback: v => 'KSH ' + fmt(v) }, grid: { color: 'rgba(212, 175, 55, 0.08)' } }
       }
     }
   });
@@ -1071,7 +1071,7 @@ function renderPending(txData) {
   let html = `<table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Amount</th><th>Method</th><th>Reference</th><th>Actions</th></tr></thead><tbody>`;
   pending.forEach(t => {
     storeTx(t);
-    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td style="color:var(--green);font-weight:bold;">$${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td style="font-size:11px;color:var(--muted);">${escHtml(t.reference || '—')}</td><td><div class="action-btns"><button class="btn-sm btn-green" onclick="openApproveModal('${t.id}')">✓ Approve</button><button class="btn-sm btn-danger" onclick="openRejectModal('${t.id}')">✗ Reject</button></div></td></tr>`;
+    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td style="color:var(--green);font-weight:bold;">KSH ${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td style="font-size:11px;color:var(--muted);">${escHtml(t.reference || '—')}</td><td><div class="action-btns"><button class="btn-sm btn-green" onclick="openApproveModal('${t.id}')">✓ Approve</button><button class="btn-sm btn-danger" onclick="openRejectModal('${t.id}')">✗ Reject</button></div></td></tr>`;
   });
   html += '</tbody></table>';
   setHTML('pendingList', html);
@@ -1088,7 +1088,7 @@ function renderPendingWithdrawals(txData) {
     const typeLabel = isRef ? '🎁 Referral' : '💰 Account';
     const fullAddress = t.deposit_address || '—';
     const displayAddress = fullAddress.substring(0, 20) + (fullAddress.length > 20 ? '...' : '');
-    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td>${typeLabel}</td><td style="font-weight:bold;">$${fmt(t.amount_usd)}</td><td><span class="badge badge-info">${escHtml(t.method || '—')}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><span style="font-family:monospace;font-size:10px;color:var(--muted);">${displayAddress}</span>${fullAddress !== '—' ? `<button class="btn-sm btn-gold-soft" style="padding:4px 8px;font-size:10px;white-space:nowrap;" onclick="copyWdrAddress('${fullAddress}', this)">📋</button>` : ''}</div></td><td><div class="action-btns"><button class="btn-sm btn-green" onclick="openApproveWdrModal('${t.id}')">✓ Approve</button><button class="btn-sm btn-danger" onclick="openRejectWdrModal('${t.id}')">✗ Reject</button></div></td></tr>`;
+    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td>${typeLabel}</td><td style="font-weight:bold;">KSH ${fmt(t.amount_usd)}</td><td><span class="badge badge-info">${escHtml(t.method || '—')}</span></td><td><div style="display:flex;align-items:center;gap:6px;"><span style="font-family:monospace;font-size:10px;color:var(--muted);">${displayAddress}</span>${fullAddress !== '—' ? `<button class="btn-sm btn-gold-soft" style="padding:4px 8px;font-size:10px;white-space:nowrap;" onclick="copyWdrAddress('${fullAddress}', this)">📋</button>` : ''}</div></td><td><div class="action-btns"><button class="btn-sm btn-green" onclick="openApproveWdrModal('${t.id}')">✓ Approve</button><button class="btn-sm btn-danger" onclick="openRejectWdrModal('${t.id}')">✗ Reject</button></div></td></tr>`;
   });
   html += '</tbody></table>';
   setHTML('pendingWdrList', html);
@@ -1119,7 +1119,7 @@ function renderTx(txs) {
   txs.forEach(t => {
     storeTx(t);
     const bc = t.status === 'COMPLETED' ? 'badge-success' : t.status === 'PENDING' ? 'badge-pending' : 'badge-danger';
-    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td>${(t.type || '').replace(/_/g, ' ')}</td><td style="font-weight:bold;">$${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td><span class="badge ${bc}">${t.status}</span></td><td style="font-size:11px;color:var(--muted);">${escHtml(t.reference || '—')}</td></tr>`;
+    html += `<tr><td style="color:var(--muted);font-size:11px;">${(t.created_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td>${(t.type || '').replace(/_/g, ' ')}</td><td style="font-weight:bold;">KSH ${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td><span class="badge ${bc}">${t.status}</span></td><td style="font-size:11px;color:var(--muted);">${escHtml(t.reference || '—')}</td></tr>`;
   });
   html += '</tbody></table>';
   setHTML('txList', html);
@@ -1144,7 +1144,7 @@ async function loadReferrals() {
   if (!d.data.length) { setHTML('referralList', '<div class="empty">No referrals</div>'); return; }
   let html = `<table class="tbl"><thead><tr><th>Date</th><th>Referrer</th><th>Referred User</th><th>Commission</th><th>Status</th></tr></thead><tbody>`;
   d.data.forEach(r => {
-    html += `<tr><td style="font-size:11px;color:var(--muted);">${(r.created_at || '').substring(0, 10)}</td><td><strong>${escHtml(r.referrer_name || '—')}</strong></td><td><strong>${escHtml(r.referred_name || '—')}</strong></td><td style="color:var(--green);font-weight:bold;">$${fmt(r.commission_usd)}</td><td><span class="badge badge-success">Credited</span></td></tr>`;
+    html += `<tr><td style="font-size:11px;color:var(--muted);">${(r.created_at || '').substring(0, 10)}</td><td><strong>${escHtml(r.referrer_name || '—')}</strong></td><td><strong>${escHtml(r.referred_name || '—')}</strong></td><td style="color:var(--green);font-weight:bold;">KSH ${fmt(r.commission_usd)}</td><td><span class="badge badge-success">Credited</span></td></tr>`;
   });
   html += '</tbody></table>';
   setHTML('referralList', html);
@@ -1160,7 +1160,7 @@ async function loadTrades() {
   let html = `<table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Symbol</th><th>Side</th><th>Entry</th><th>Close</th><th>P&L</th><th>Status</th></tr></thead><tbody>`;
   d.data.forEach(t => {
     const pnlColor = (t.pnl || 0) >= 0 ? 'var(--green)' : 'var(--red)';
-    html += `<tr><td style="font-size:11px;color:var(--muted);">${(t.opened_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td style="color:var(--gold);font-weight:bold;">${escHtml(t.symbol || '—')}</td><td>${t.direction === 'BUY' ? '📈' : '📉'} ${escHtml(t.direction || '—')}</td><td>$${fmt(t.entry_price)}</td><td>${t.close_price ? '$' + fmt(t.close_price) : 'Open'}</td><td style="color:${pnlColor};font-weight:bold;">${t.pnl != null ? (t.pnl >= 0 ? '+' : '') + fmt(t.pnl) : '—'}</td><td><span class="badge ${t.status === 'OPEN' ? 'badge-info' : 'badge-success'}">${t.status}</span></td></tr>`;
+    html += `<tr><td style="font-size:11px;color:var(--muted);">${(t.opened_at || '').substring(0, 16).replace('T', ' ')}</td><td><strong>${escHtml(t.user_name || '—')}</strong></td><td style="color:var(--gold);font-weight:bold;">${escHtml(t.symbol || '—')}</td><td>${t.direction === 'BUY' ? '📈' : '📉'} ${escHtml(t.direction || '—')}</td><td>KSH ${fmt(t.entry_price)}</td><td>${t.close_price ? 'KSH ' + fmt(t.close_price) : 'Open'}</td><td style="color:${pnlColor};font-weight:bold;">${t.pnl != null ? (t.pnl >= 0 ? '+' : '') + fmt(t.pnl) : '—'}</td><td><span class="badge ${t.status === 'OPEN' ? 'badge-info' : 'badge-success'}">${t.status}</span></td></tr>`;
   });
   html += '</tbody></table>';
   setHTML('tradeList', html);
@@ -1195,7 +1195,7 @@ function populateAdjustClients() {
   allClients.forEach(c => {
     const opt = document.createElement('option');
     opt.value = c.id;
-    opt.textContent = `${c.name} (${c.email}) — $${fmt(c.balance)}`;
+    opt.textContent = `${c.name} (${c.email}) — KSH ${fmt(c.balance)}`;
     if (c.id === cur) opt.selected = true;
     sel.appendChild(opt);
   });
@@ -1269,7 +1269,7 @@ function populateRefReferred() {
   allClients.forEach(c => {
     const opt = document.createElement('option');
     opt.value = c.id;
-    opt.textContent = `${c.name} (${c.email}) — $${fmt(c.balance)}`;
+    opt.textContent = `${c.name} (${c.email}) — KSH ${fmt(c.balance)}`;
     sel.appendChild(opt);
   });
 }
@@ -1337,7 +1337,7 @@ function openApproveModal(txId) {
   if (!t) return;
   document.getElementById('modalTxId').value = txId;
   document.getElementById('modalClientName').textContent = t.user_name || '—';
-  document.getElementById('modalAmount').textContent = '$' + fmt(t.amount_usd);
+  document.getElementById('modalAmount').textContent = 'KSH ' + fmt(t.amount_usd);
   document.getElementById('modalNetwork').textContent = t.method || '—';
   document.getElementById('modalRef').textContent = t.reference || '—';
   document.getElementById('approveModal').classList.add('show');
@@ -1356,7 +1356,7 @@ function openApproveWdrModal(txId) {
   if (!t) return;
   document.getElementById('wdrModalTxId').value = txId;
   document.getElementById('wdrModalClientName').textContent = t.user_name || '—';
-  document.getElementById('wdrModalAmount').textContent = '$' + fmt(t.amount_usd);
+  document.getElementById('wdrModalAmount').textContent = 'KSH ' + fmt(t.amount_usd);
   document.getElementById('wdrModalNetwork').textContent = t.method || '—';
   document.getElementById('wdrModalAddress').textContent = t.deposit_address || '—';
   document.getElementById('approveWdrModal').classList.add('show');
