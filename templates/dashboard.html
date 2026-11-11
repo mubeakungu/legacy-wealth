@@ -456,27 +456,27 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-label">Account Balance</div>
-          <div class="stat-value">$<span id="statBalance">0.00</span></div>
+          <div class="stat-value">KSH <span id="statBalance">0.00</span></div>
           <div class="stat-sub">Available</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Equity</div>
-          <div class="stat-value">$<span id="statEquity">0.00</span></div>
+          <div class="stat-value">KSH <span id="statEquity">0.00</span></div>
           <div class="stat-sub">Current value</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Deposited</div>
-          <div class="stat-value">$<span id="statDeposited">0.00</span></div>
+          <div class="stat-value">KSH <span id="statDeposited">0.00</span></div>
           <div class="stat-sub">All time</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Withdrawn</div>
-          <div class="stat-value">$<span id="statWithdrawn">0.00</span></div>
+          <div class="stat-value">KSH <span id="statWithdrawn">0.00</span></div>
           <div class="stat-sub">All time</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Referral Earnings</div>
-          <div class="stat-value" style="color:var(--green);">$<span id="statRefEarned">0.00</span></div>
+          <div class="stat-value" style="color:var(--green);">KSH <span id="statRefEarned">0.00</span></div>
           <div class="stat-sub"><span id="statRefCount">0</span> referrals</div>
         </div>
       </div>
@@ -498,7 +498,7 @@
         <div class="card">
           <div class="card-title">💹 P&amp;L Status</div>
           <div class="card-subtitle">Cumulative profit &amp; loss</div>
-          <div style="font-size:28px; font-weight:700; margin-bottom:4px; color:var(--green);" id="plVal">$0.00</div>
+          <div style="font-size:28px; font-weight:700; margin-bottom:4px; color:var(--green);" id="plVal">KSH 0.00</div>
           <div style="font-size:12px; color:var(--muted); margin-bottom:12px;" id="plSub">Net positive</div>
           <div class="chart-container"><canvas id="plChart"></canvas></div>
         </div>
@@ -714,7 +714,7 @@
 const api  = (url, opts = {}) => fetch(url, { credentials: 'same-origin', ...opts }).then(r => r.json());
 const post = (u, b) => api(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
 const fmt  = n => parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const fmtD = n => '$' + fmt(n);
+const fmtD = n => 'KSH ' + fmt(n);
 
 function escHtml(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -862,7 +862,7 @@ async function submitWithdraw() {
   const network = document.getElementById('withdrawNetwork').value;
   const address = document.getElementById('withdrawAddress').value.trim();
   const pin = document.getElementById('withdrawPin').value.trim();
-  if (!amount || amount < 30) { showError('Minimum withdrawal is $30', 'withdrawError'); return; }
+  if (!amount || amount < 30) { showError('Minimum withdrawal is KES 30', 'withdrawError'); return; }
   if (!address || !pin) { showError('Enter all fields', 'withdrawError'); return; }
   const d = await post('/api/client/withdraw', { amount, network, address, pin });
   if (!d.success) { showError(d.error, 'withdrawError'); return; }
@@ -890,7 +890,7 @@ async function submitRefWithdraw() {
   const network = document.getElementById('refNetwork').value;
   const address = document.getElementById('refAddress').value.trim();
   const pin = document.getElementById('refPin').value.trim();
-  if (!amount || amount < 16) { showError('Minimum referral withdrawal is $16', 'refError'); return; }
+  if (!amount || amount < 16) { showError('Minimum referral withdrawal is KES 16', 'refError'); return; }
   if (!address || !pin) { showError('Enter all fields', 'refError'); return; }
   const d = await post('/api/client/referral/withdraw', { amount, network, address, pin });
   if (!d.success) { showError(d.error, 'refError'); return; }
@@ -909,7 +909,7 @@ async function loadReferrals() {
   }
   let html = '<table class="tbl"><thead><tr><th>Date</th><th>User</th><th>Commission</th><th>Status</th></tr></thead><tbody>';
   d.data.forEach(r => {
-    html += `<tr><td>${(r.created_at || '').substring(0,10)}</td><td>${escHtml(r.referred_name || '—')}</td><td style="color:var(--green);font-weight:bold;">$${fmt(r.commission_usd)}</td><td><span class="badge badge-success">${escHtml(r.status)}</span></td></tr>`;
+    html += `<tr><td>${(r.created_at || '').substring(0,10)}</td><td>${escHtml(r.referred_name || '—')}</td><td style="color:var(--green);font-weight:bold;">KSH ${fmt(r.commission_usd)}</td><td><span class="badge badge-success">${escHtml(r.status)}</span></td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('referralList').innerHTML = html;
@@ -924,7 +924,7 @@ async function loadTransactions() {
   let html = '<table class="tbl"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead><tbody>';
   d.data.forEach(t => {
     const bc = t.status === 'COMPLETED' ? 'badge-success' : 'badge-danger';
-    html += `<tr><td>${(t.created_at || '').substring(0,16).replace('T',' ')}</td><td>${(t.type || '').replace(/_/g,' ')}</td><td style="font-weight:bold;">$${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td><span class="badge ${bc}">${escHtml(t.status)}</span></td></tr>`;
+    html += `<tr><td>${(t.created_at || '').substring(0,16).replace('T',' ')}</td><td>${(t.type || '').replace(/_/g,' ')}</td><td style="font-weight:bold;">KSH ${fmt(t.amount_usd)}</td><td>${escHtml(t.method || '—')}</td><td><span class="badge ${bc}">${escHtml(t.status)}</span></td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('txList').innerHTML = html;
@@ -940,7 +940,7 @@ async function loadTrades() {
   d.data.forEach(t => {
     const pnl = t.pnl || 0;
     const pnlColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
-    html += `<tr><td>${(t.opened_at || '').substring(0,16).replace('T',' ')}</td><td style="color:var(--gold);font-weight:bold;">${escHtml(t.symbol || '—')}</td><td>${escHtml(t.direction || '—')}</td><td>$${fmt(t.entry_price)}</td><td>${t.close_price ? '$' + fmt(t.close_price) : 'Open'}</td><td style="color:${pnlColor};font-weight:bold;">$${fmt(pnl)}</td><td><span class="badge ${t.status === 'OPEN' ? 'badge-danger' : 'badge-success'}">${escHtml(t.status)}</span></td></tr>`;
+    html += `<tr><td>${(t.opened_at || '').substring(0,16).replace('T',' ')}</td><td style="color:var(--gold);font-weight:bold;">${escHtml(t.symbol || '—')}</td><td>${escHtml(t.direction || '—')}</td><td>KSH ${fmt(t.entry_price)}</td><td>${t.close_price ? 'KSH ' + fmt(t.close_price) : 'Open'}</td><td style="color:${pnlColor};font-weight:bold;">KSH ${fmt(pnl)}</td><td><span class="badge ${t.status === 'OPEN' ? 'badge-danger' : 'badge-success'}">${escHtml(t.status)}</span></td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('tradeList').innerHTML = html;
@@ -986,7 +986,7 @@ async function loadHistoryCharts() {
       plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { maxTicksLimit: 6 }, grid: { color: gridColor } },
-        y: { ticks: { callback: v => '$' + fmt(v) }, grid: { color: gridColor } }
+        y: { ticks: { callback: v => 'KSH ' + fmt(v) }, grid: { color: gridColor } }
       }
     }
   });
@@ -1019,7 +1019,7 @@ async function loadHistoryCharts() {
       plugins: { legend: { labels: { color: '#8b93a7' } } },
       scales: {
         x: { grid: { color: gridColor } },
-        y: { ticks: { callback: v => '$' + fmt(v) }, grid: { color: gridColor } }
+        y: { ticks: { callback: v => 'KSH ' + fmt(v) }, grid: { color: gridColor } }
       }
     }
   });
@@ -1043,7 +1043,7 @@ async function loadHistoryCharts() {
       plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { maxTicksLimit: 6 }, grid: { color: gridColor } },
-        y: { ticks: { callback: v => '$' + fmt(v) }, grid: { color: gridColor } }
+        y: { ticks: { callback: v => 'KSH ' + fmt(v) }, grid: { color: gridColor } }
       }
     }
   });
@@ -1078,7 +1078,7 @@ async function pollLivePrice() {
   hist.push(price);
   if (hist.length > 30) hist.shift();
 
-  document.getElementById('livePriceVal').textContent = '$' + fmt(price);
+  document.getElementById('livePriceVal').textContent = 'KSH ' + fmt(price);
   if (hist.length > 1) {
     const chg = ((price - hist[0]) / hist[0]) * 100;
     const chgEl = document.getElementById('livePriceChg');
@@ -1095,7 +1095,7 @@ async function pollLivePrice() {
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
         x: { display: false },
-        y: { ticks: { callback: v => '$' + fmt(v) }, grid: { color: 'rgba(212, 175, 55, 0.08)' } }
+        y: { ticks: { callback: v => 'KSH ' + fmt(v) }, grid: { color: 'rgba(212, 175, 55, 0.08)' } }
       }
     }
   });
